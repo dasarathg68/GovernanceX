@@ -32,7 +32,7 @@ export function useAuth() {
       localStorage.setItem('user', JSON.stringify(user1.user))
       isAuthenticated.value = true
       user.value = user1.user
-      router.push('/ballots')
+      router.push('/home')
     } else {
       throw new Error('User not found')
     }
@@ -45,7 +45,7 @@ export function useAuth() {
       localStorage.setItem('isAuthenticated', 'true')
       isAuthenticated.value = true
 
-      router.push('/ballots')
+      router.push('/home')
     } else {
       throw new Error('User not found')
     }

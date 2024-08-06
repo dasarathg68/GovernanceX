@@ -163,10 +163,11 @@ const siwe = async () => {
     show(ToastType.Error, 'Failed to SIWE')
   }
 }
-watch(siweStatus, (value) => {
+watch(siweStatus, async (value) => {
   if (value == 'success') {
     show(ToastType.Success, 'User Logged in successfully')
-    router.push('/')
+    auth.isAuthenticated.value = true
+    await router.push('/home')
   } else if (value == 'error') {
     show(ToastType.Error, 'Failed to SIWE')
   }

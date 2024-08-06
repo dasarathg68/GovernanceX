@@ -16,8 +16,10 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@firebase/auth": "^1.7.6",
     "@tanstack/vue-query": "^5.51.21",
     "@wagmi/vue": "^0.0.34",
+    "firebase": "^10.12.5",
     "pinia": "^2.1.7",
     "viem": "^2.18.8",
     "vue": "^3.4.29",

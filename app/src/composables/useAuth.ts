@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import { auth } from '@/config/firebaseConfig'
 import router from '@/router'
+import { SiweMessage } from 'siwe'
+
 import {
   createUserWithEmailAndPassword,
   getAdditionalUserInfo,

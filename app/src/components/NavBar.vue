@@ -7,10 +7,20 @@
       </div>
     </div>
     <div class="navbar-end">
-      <!-- <div>
-        <button class="btn btn-primary" @click="siwe">SIWE</button>
-      </div> -->
-      <button class="btn btn-primary" @click="open">Wallet</button>
+      <div class="dropdown w-48 rounded-full mr-12">
+        <div tabindex="0" role="button" class="">
+          <div class="btn w-full flex flex-row justify-between bg-base-primary">
+            <img src="../assets/Ethereum.png" height="20" width="20" alt="Ethereum Icon" />
+            <div class="text-xs flex" v-if="isFetching">
+              <span class="loading loading-dots loading-xs" data-test="balance-loading"></span>
+            </div>
+            <div v-else>
+              <span class="text-black font-bold font-mono"> {{ balance }}</span>
+              <span class="ml-2 text-black font-bold font-mono text-xs">ETH</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="dropdown cursor-pointer">
         <div tabindex="0">
           Themes
@@ -71,6 +81,11 @@ import IconAvatar from '@/components/icons/IconAvatar.vue'
 import { useAuth } from '@/composables/useAuth'
 import { ref, watch } from 'vue'
 import { onMounted, onBeforeUnmount } from 'vue'
+import { useAccount } from '@wagmi/vue'
+import { useBalance } from '@wagmi/vue'
+
+const account = useAccount()
+const { data, isFetching } = useBalance({ address: account.address })
 
 // const { isConnected, userAddress, connectWallet, signInWithEthereum } = useWallet()
 
@@ -86,7 +101,11 @@ const router = useRouter()
 const navigateToLink = (id: string) => {
   router.push('/' + id)
 }
+const balance = ref<any>(0)
 
+watch(data, (newData: any) => {
+  balance.value = (parseFloat(newData.value) / 10 ** parseFloat(newData.decimals)).toFixed(4)
+})
 onMounted(async () => {})
 </script>
 

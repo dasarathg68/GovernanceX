@@ -10,7 +10,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/api/nonce", async (req, res) => {
+app.get("/api/nonce/:address", async (req, res) => {
   const { address } = req.params;
   try {
     if (!address)

@@ -74,7 +74,7 @@
         <button class="btn btn-primary justify-center mt-2" @click="googleLogin">
           <IconGoogle />
         </button>
-        <button class="btn btn-primary justify-center mt-2" @click="siwe">
+        <button class="btn btn-primary justify-center mt-2" @click="siwe" :key="index">
           <IconMetaMask />
         </button>
       </div>
@@ -95,21 +95,29 @@ import IconMetaMask from '@/components/icons/IconMetamask.vue'
 import ForgotPasswordModal from '@/components/modals/ForgotPasswordModal.vue'
 import { useToastStore } from '@/stores/toast'
 import { ToastType } from '@/types/toast-type'
+import { SiweMessage } from 'siwe'
+import { useAccount, useSwitchChain, useSignMessage } from '@wagmi/vue'
+import { injected } from '@wagmi/connectors'
+import axios from 'axios'
+
 const { show } = useToastStore()
+
+import { useConnect, useChainId } from '@wagmi/vue'
+const { address } = useAccount()
+const { connect } = useConnect()
+const { switchChain } = useSwitchChain()
+const { signMessage } = useSignMessage()
+
+const chainId = useChainId()
 
 const auth = useAuth()
 
-const {
-  // isConnected, userAddress, connectWallet,
-  signInWithEthereum
-} = useAuth()
 const showForgotPasswordModal = ref(false)
 const activeTab = ref('login') // Set initial tab to login
 const email = ref('')
 const password = ref('')
 const registerEmail = ref('')
 const registerPassword = ref('')
-
 const toggleForgotPasswordModal = () => {
   showForgotPasswordModal.value = !showForgotPasswordModal.value
 }
@@ -132,9 +140,25 @@ const register = async () => {
 }
 const siwe = async () => {
   try {
-    await signInWithEthereum()
-    show(ToastType.Success, 'User Logged in successfully')
+    if (!address.value) {
+      connect({ connector: injected() })
+    }
+    if (chainId.value !== 11155111) switchChain({ chainId: 11155111 })
+
+    const response = await axios.get(`http://localhost:3000/api/nonce/${address.value}`)
+    console.log(response)
+    const message = new SiweMessage({
+      domain: window.location.host,
+      address: address.value,
+      statement: 'Sign in with Ethereum to GovernanceX',
+      uri: window.location.origin,
+      version: '1',
+      chainId: chainId.value,
+      nonce: response.data.nonce
+    })
+    signMessage({ message: message.prepareMessage() })
   } catch (e: any) {
+    console.log(e)
     show(ToastType.Error, 'Failed to SIWE')
   }
 }

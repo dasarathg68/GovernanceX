@@ -19,6 +19,7 @@
     "@firebase/auth": "^1.7.6",
     "@tanstack/vue-query": "^5.51.21",
     "@wagmi/vue": "^0.0.34",
+    "axios": "^1.7.3",
     "firebase": "^10.12.5",
     "pinia": "^2.1.7",
     "siwe": "^2.3.2",

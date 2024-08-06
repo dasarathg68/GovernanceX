@@ -146,7 +146,7 @@ const siwe = async () => {
     }
     if (chainId.value !== 11155111) switchChain({ chainId: 11155111 })
 
-    const response = await axios.get(`http://localhost:3000/api/nonce/${address.value}`)
+    const response = await axios.get(`http://localhost:3000/api/nonce`)
     console.log(response)
     const message = new SiweMessage({
       domain: window.location.host,

@@ -18,14 +18,19 @@
   "dependencies": {
     "@firebase/auth": "^1.7.6",
     "@tanstack/vue-query": "^5.51.21",
+    "@wagmi/connectors": "^5.1.2",
+    "@wagmi/core": "^2.13.1",
     "@wagmi/vue": "^0.0.34",
+    "@web3modal/siwe": "^5.0.11",
+    "@web3modal/wagmi": "^5.0.11",
     "axios": "^1.7.3",
     "firebase": "^10.12.5",
     "pinia": "^2.1.7",
     "siwe": "^2.3.2",
     "viem": "^2.18.8",
     "vue": "^3.4.29",
-    "vue-router": "^4.4.2"
+    "vue-router": "^4.4.2",
+    "web3modal": "^1.9.12"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

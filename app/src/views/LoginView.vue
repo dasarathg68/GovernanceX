@@ -166,7 +166,7 @@ const siwe = async () => {
 watch(siweStatus, async (value) => {
   if (value == 'success') {
     show(ToastType.Success, 'User Logged in successfully')
-    auth.isAuthenticated.value = true
+    auth.signInWithEthereum()
     await router.push('/home')
   } else if (value == 'error') {
     show(ToastType.Error, 'Failed to SIWE')

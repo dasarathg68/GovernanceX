@@ -22,7 +22,10 @@ export function useAuth() {
       throw new Error('User not created')
     }
   }
-  const signInWithEthereum = async () => {}
+  const signInWithEthereum = async () => {
+    isAuthenticated.value = true
+    localStorage.setItem('isAuthenticated', 'true')
+  }
   async function loginWithGoogle() {
     const provider = new GoogleAuthProvider()
     const user1 = await signInWithPopup(auth, provider)

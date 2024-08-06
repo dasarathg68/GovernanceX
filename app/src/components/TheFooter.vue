@@ -15,7 +15,7 @@
         ></path>
       </svg>
 
-      <p>e-Voting Portal<br /></p>
+      <p>GovernanceX<br /></p>
       <h6 class="">Redefining voting & governance</h6>
     </aside>
     <nav>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center mt-40 rounded-box pb-5">
     <div class="justify-center shadow-xl">
-      <!-- <h1 class="text-4xl justify-center">e-Voting Portal</h1> -->
+      <!-- <h1 class="text-4xl justify-center">GovernanceX</h1> -->
 
       <div role="tablist" className="tabs tabs-lifted tabs-lg p-4">
         <a

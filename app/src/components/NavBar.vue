@@ -3,7 +3,7 @@
   <div class="navbar bg-base-100 rounded-lg w-full shadow-lg z-50 fixed">
     <div class="navbar-start">
       <div class="cursor-pointer btn-ghost text-lg" @click="navigateToLink('ballots')">
-        e-Voting Portal
+        GovernanceX
       </div>
     </div>
     <div class="navbar-end">

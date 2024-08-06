@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="navbar-end">
-      <div class="dropdown w-48 rounded-full mr-12">
+      <div class="dropdown w-48 rounded-full mr-12" v-if="isAuthenticated">
         <div tabindex="0" role="button" class="">
           <div class="btn w-full flex flex-row justify-between bg-base-primary">
             <img src="../assets/Ethereum.png" height="20" width="20" alt="Ethereum Icon" />
@@ -85,11 +85,11 @@ import { useAccount } from '@wagmi/vue'
 import { useBalance } from '@wagmi/vue'
 
 const account = useAccount()
-const { data, isFetching } = useBalance({ address: account.address })
+const { data, isFetching, refetch } = useBalance({ address: account.address })
 
 // const { isConnected, userAddress, connectWallet, signInWithEthereum } = useWallet()
 
-const { user } = useAuth()
+const { user, isAuthenticated } = useAuth()
 
 defineProps<{
   themesAvailable: string[]
@@ -106,7 +106,9 @@ const balance = ref<any>(0)
 watch(data, (newData: any) => {
   balance.value = (parseFloat(newData.value) / 10 ** parseFloat(newData.decimals)).toFixed(4)
 })
-onMounted(async () => {})
+onMounted(async () => {
+  refetch()
+})
 </script>
 
 <style scoped></style>

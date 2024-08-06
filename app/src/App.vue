@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { reconnect } from '@wagmi/core'
-
 import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
 import TheFooter from '@/components/TheFooter.vue'

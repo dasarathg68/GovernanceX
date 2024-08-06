@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { reconnect } from '@wagmi/core'
-import { createWeb3Modal } from '@web3modal/wagmi/vue'
 
 import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
@@ -10,7 +9,6 @@ import { storeToRefs } from 'pinia'
 import { useAuth } from '@/composables/useAuth'
 import { useToastStore } from '@/stores/toast'
 import NotificationToast from '@/components/NotificationToast.vue'
-import { projectId, config, siweConfig } from './utils/siweUtils'
 
 import { ToastType } from '@/types/toast-type'
 const toastStore = useToastStore()
@@ -21,16 +19,6 @@ const logout = () => {
   show(ToastType.Success, 'User Logged out successfully')
   useAuth().logout()
 }
-
-// 3. Create modal
-reconnect(config)
-createWeb3Modal({
-  wagmiConfig: config,
-  projectId,
-  enableAnalytics: true, // Optional - defaults to your Cloud configuration
-  enableOnramp: true, // Optional - false as default,
-  siweConfig
-})
 </script>
 
 <template>

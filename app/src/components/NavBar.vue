@@ -66,14 +66,11 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { useWeb3Modal } from '@web3modal/wagmi/vue'
 import IconBell from '@/components/icons/IconBell.vue'
 import IconAvatar from '@/components/icons/IconAvatar.vue'
 import { useAuth } from '@/composables/useAuth'
 import { ref, watch } from 'vue'
 import { onMounted, onBeforeUnmount } from 'vue'
-
-const { open, close } = useWeb3Modal()
 
 // const { isConnected, userAddress, connectWallet, signInWithEthereum } = useWallet()
 

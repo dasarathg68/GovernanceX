@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { useAuth } from '@/composables/useAuth'
 import IconGoogle from '@/components/icons/IconGoogle.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import IconMetaMask from '@/components/icons/IconMetamask.vue'
 import ForgotPasswordModal from '@/components/modals/ForgotPasswordModal.vue'
 import { useToastStore } from '@/stores/toast'
@@ -103,10 +103,11 @@ import axios from 'axios'
 const { show } = useToastStore()
 
 import { useConnect, useChainId } from '@wagmi/vue'
+import router from '@/router'
 const { address } = useAccount()
 const { connect } = useConnect()
 const { switchChain } = useSwitchChain()
-const { signMessage } = useSignMessage()
+const { signMessage, status: siweStatus } = useSignMessage()
 
 const chainId = useChainId()
 
@@ -162,6 +163,14 @@ const siwe = async () => {
     show(ToastType.Error, 'Failed to SIWE')
   }
 }
+watch(siweStatus, (value) => {
+  if (value == 'success') {
+    show(ToastType.Success, 'User Logged in successfully')
+    router.push('/')
+  } else if (value == 'error') {
+    show(ToastType.Error, 'Failed to SIWE')
+  }
+})
 const googleLogin = async () => {
   try {
     await auth.loginWithGoogle()

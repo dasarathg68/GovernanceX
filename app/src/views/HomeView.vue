@@ -1,7 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAccount } from '@wagmi/vue'
+import Account from '@/components/AccountComp.vue'
+import Connect from '@/components/ConnectWallet.vue'
+
+const { isConnected } = useAccount()
+</script>
 
 <template>
-  Hi
-  <div class="text-2xl bg-stone-800">Home</div>
-  <p>Click on the links above to navigate to different pages.</p>
+  <Account v-if="isConnected" />
+  <Connect v-else />
 </template>

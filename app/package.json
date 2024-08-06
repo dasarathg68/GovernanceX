@@ -16,7 +16,10 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^5.51.21",
+    "@wagmi/vue": "^0.0.34",
     "pinia": "^2.1.7",
+    "viem": "^2.18.8",
     "vue": "^3.4.29",
     "vue-router": "^4.4.2"
   },

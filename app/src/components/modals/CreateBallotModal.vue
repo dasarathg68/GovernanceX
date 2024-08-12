@@ -56,7 +56,6 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps } from 'vue'
-import { useVotingStore } from '@/stores/votes'
 
 const emits = defineEmits(['toggleCreateBallotModal'])
 const props = defineProps<{

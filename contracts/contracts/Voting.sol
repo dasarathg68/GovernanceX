@@ -4,8 +4,16 @@ pragma solidity ^0.8.24;
 import "./Types.sol";
 import "hardhat/console.sol";
 
-contract Voting {
+
+import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol';
+import '@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol';
+
+
+contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable  {
     mapping(uint256=>Types.Proposal) public proposalsById; 
+
+    address public votingAddress;
 
     uint256 public proposalCount;
 
@@ -13,6 +21,13 @@ contract Voting {
     event DirectiveVoted(address indexed voter, uint256 indexed proposalId, uint256 vote);
     event ElectionVoted(address indexed voter, uint256 indexed proposalId, address indexed candidateAddress);
     event ProposalConcluded(uint256 indexed proposalId, bool isActive);
+
+    function initialize(address _votingAddress) public initializer {
+    __Ownable_init(msg.sender);
+    __ReentrancyGuard_init();
+    __Pausable_init();
+    votingAddress = _votingAddress;
+  }
 
     function addProposal(Types.Proposal calldata _proposal) public {
         require(bytes(_proposal.title).length > 0, "Title cannot be empty");

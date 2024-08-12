@@ -47,7 +47,7 @@ contract Voting {
     function voteDirective(uint256 proposalId, uint256 vote) public {
         require(proposalId < proposalCount, "Proposal does not exist");
 
-        Types.Proposal storage proposal = getProposalById(proposalId);
+        Types.Proposal storage proposal = proposalsById[proposalId];
         require(proposal.isActive, "Proposal is not active");
 
         Types.Member storage voter = findVoter(proposal, msg.sender);
@@ -64,10 +64,12 @@ contract Voting {
     function voteElection( uint256 proposalId, address candidateAddress) public {
         require(proposalId < proposalCount, "Proposal does not exist");
 
-        Types.Proposal storage proposal = getProposalById( proposalId);
+        Types.Proposal storage proposal = proposalsById[proposalId];
         require(proposal.isActive, "Proposal is not active");
 
         Types.Member storage voter = findVoter(proposal, msg.sender);
+        console.log("hi");
+
 
         require(voter.isEligible, "You are not eligible to vote");
         require(!voter.isVoted, "You have already voted");
@@ -89,7 +91,7 @@ contract Voting {
     function concludeProposal(uint256 proposalId) public {
         require(proposalId < proposalCount, "Proposal does not exist");
 
-        Types.Proposal storage proposal = getProposalById( proposalId);
+        Types.Proposal storage proposal = proposalsById[proposalId];
         proposal.isActive = !proposal.isActive;
 
         emit ProposalConcluded(proposalId, proposal.isActive);
@@ -103,7 +105,7 @@ contract Voting {
         }
         revert("You are not registered to vote in this proposal");
     }
-    function getProposalById(uint256 proposalId) internal view returns (Types.Proposal storage) {
+    function getProposalById(uint256 proposalId) public view returns (Types.Proposal memory) {
     require(proposalId < proposalCount, "Proposal does not exist");
     return proposalsById[proposalId];
 }

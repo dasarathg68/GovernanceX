@@ -13,6 +13,26 @@ import { useToastStore } from '@/stores/toast'
 import { onMounted, ref } from 'vue'
 import { ToastType } from '@/types'
 import LoadingButton from '@/components/LoadingButton.vue'
+import { supabase } from '@/utils/supabase'
+import { get } from 'node_modules/axios/index.cjs'
+
+async function storeDeployedAddress() {
+  try {
+    await supabase
+      .from('Contract')
+      .insert([{ userAddress: currentAddress.value, deployedAddress: deployedAddress.value }])
+  } catch (error) {
+    show(ToastType.Error, 'Error storing contract address')
+    console.error(error)
+  }
+}
+async function getDeployedAddress() {
+  const { data } = await supabase
+    .from('Contract')
+    .select('deployedAddress')
+    .eq('userAddress', currentAddress.value)
+  console.log(data)
+}
 
 const { show } = useToastStore()
 const { address: currentAddress } = useAccount()
@@ -25,7 +45,8 @@ const currentChain = useChainId()
 const compatibleChainName = config.chains.find((chain) => chain.id == compatibleChain)?.name
 console.log(compatibleChainName)
 
-onMounted(() => {
+onMounted(async () => {
+  await getDeployedAddress()
   if (currentChain.value != compatibleChain) {
     show(ToastType.Error, `Please switch to the ${compatibleChainName} network`)
     isCorrectChain.value = false
@@ -56,6 +77,7 @@ const deployBeaconProxy = async () => {
         nonce: BigInt(nonce)
       })
       console.log('deployedAddress', deployedAddress)
+      await storeDeployedAddress()
       show(ToastType.Success, 'Contract deployed successfully')
       isDeploying.value = false
     }

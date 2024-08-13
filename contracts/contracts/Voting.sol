@@ -13,7 +13,6 @@ import '@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable  {
     mapping(uint256=>Types.Proposal) public proposalsById; 
 
-    address public votingAddress;
 
     uint256 public proposalCount;
 
@@ -22,11 +21,10 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
     event ElectionVoted(address indexed voter, uint256 indexed proposalId, address indexed candidateAddress);
     event ProposalConcluded(uint256 indexed proposalId, bool isActive);
 
-    function initialize(address _votingAddress) public initializer {
+    function initialize() public initializer {
     __Ownable_init(msg.sender);
     __ReentrancyGuard_init();
     __Pausable_init();
-    votingAddress = _votingAddress;
   }
 
     function addProposal(Types.Proposal calldata _proposal) public {

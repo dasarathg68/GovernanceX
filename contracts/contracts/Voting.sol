@@ -27,6 +27,8 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
     __Pausable_init();
   }
 
+    constructor() {
+    }
     function addProposal(Types.Proposal calldata _proposal) public {
         require(bytes(_proposal.title).length > 0, "Title cannot be empty");
 

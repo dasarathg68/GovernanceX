@@ -8,6 +8,10 @@ import { NetworksUserConfig } from "hardhat/types";
 dotenv.config();
 let networks: NetworksUserConfig = {
   hardhat: {},
+  sepolia: {
+    url: process.env.SEPOLIA_URL,
+    accounts: [process.env.PRIVATE_KEY ?? ""],
+  },
 };
 
 const config: HardhatUserConfig = {

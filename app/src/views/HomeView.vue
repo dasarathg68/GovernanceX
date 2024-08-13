@@ -14,7 +14,6 @@ import { onMounted, ref } from 'vue'
 import { ToastType } from '@/types'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { supabase } from '@/utils/supabase'
-import { get } from 'node_modules/axios/index.cjs'
 
 async function storeDeployedAddress() {
   try {

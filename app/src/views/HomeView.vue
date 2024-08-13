@@ -12,12 +12,14 @@ import { useChainId, useAccount } from '@wagmi/vue'
 import { useToastStore } from '@/stores/toast'
 import { onMounted, ref } from 'vue'
 import { ToastType } from '@/types'
+import LoadingButton from '@/components/LoadingButton.vue'
 
 const { show } = useToastStore()
 const { address: currentAddress } = useAccount()
 
 const deployedAddress = ref('')
 const isCorrectChain = ref<boolean>(true)
+const isDeploying = ref<boolean>(false)
 
 const currentChain = useChainId()
 const compatibleChainName = config.chains.find((chain) => chain.id == compatibleChain)?.name
@@ -31,6 +33,39 @@ onMounted(() => {
   }
 })
 const showCreateBallotModal = ref<boolean>(false)
+const deployBeaconProxy = async () => {
+  try {
+    isDeploying.value = true
+    const encodedFunction = encodeFunctionData({
+      abi: VOTING_ABI,
+      functionName: 'initialize'
+    })
+
+    const result = await deployContract(config, {
+      abi: BEACON_PROXY_ABI,
+      bytecode: BEACON_PROXY_BYTECODE,
+      args: [VOTING_BEACON_ADDRESS, encodedFunction]
+    })
+    let nonce
+    if (currentAddress.value) {
+      nonce = await getTransactionCount(config, { address: currentAddress.value })
+    }
+    if (nonce && currentAddress.value) {
+      deployedAddress.value = getContractAddress({
+        from: currentAddress.value,
+        nonce: BigInt(nonce)
+      })
+      console.log('deployedAddress', deployedAddress)
+      show(ToastType.Success, 'Contract deployed successfully')
+      isDeploying.value = false
+    }
+    console.log('result', result)
+  } catch (error) {
+    console.error(error)
+    isDeploying.value = false
+    show(ToastType.Error, 'Error deploying contract')
+  }
+}
 </script>
 
 <template>
@@ -39,35 +74,8 @@ const showCreateBallotModal = ref<boolean>(false)
       :showCreateBallotModal="showCreateBallotModal"
       @toggleCreateBallotModal="() => (showCreateBallotModal = !showCreateBallotModal)"
     />
-    <button
-      class="btn btn-sm btn-primary"
-      @click="
-        async () => {
-          const encodedFunction = encodeFunctionData({
-            abi: VOTING_ABI,
-            functionName: 'initialize'
-          })
-
-          const result = await deployContract(config, {
-            abi: BEACON_PROXY_ABI,
-            bytecode: BEACON_PROXY_BYTECODE,
-            args: [VOTING_BEACON_ADDRESS, encodedFunction]
-          })
-          let nonce
-          if (currentAddress) {
-            nonce = await getTransactionCount(config, { address: currentAddress })
-          }
-          if (nonce && currentAddress) {
-            deployedAddress = getContractAddress({
-              from: currentAddress,
-              nonce: BigInt(nonce)
-            })
-            console.log('deployedAddress', deployedAddress)
-          }
-          console.log('result', result)
-        }
-      "
-    >
+    <LoadingButton :color="'primary min-w-32 btn-sm'" v-if="isDeploying" />
+    <button class="btn btn-sm btn-primary" @click="deployBeaconProxy" v-else>
       Deploy Contract
     </button>
   </div>

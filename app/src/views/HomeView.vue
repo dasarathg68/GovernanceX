@@ -14,12 +14,12 @@ import { onMounted, ref } from 'vue'
 import { ToastType } from '@/types'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { supabase } from '@/utils/supabase'
-
 async function storeDeployedAddress() {
   try {
     await supabase
       .from('Contract')
       .insert([{ userAddress: currentAddress.value, deployedAddress: deployedAddress.value }])
+    isDeployed.value = true
   } catch (error) {
     show(ToastType.Error, 'Error storing contract address')
     console.error(error)
@@ -30,7 +30,10 @@ async function getDeployedAddress() {
     .from('Contract')
     .select('deployedAddress')
     .eq('userAddress', currentAddress.value)
-  console.log(data)
+  if ((data as any).length > 0) {
+    deployedAddress.value = (data as any)[0].deployedAddress
+    isDeployed.value = true
+  }
 }
 
 const { show } = useToastStore()
@@ -39,6 +42,7 @@ const { address: currentAddress } = useAccount()
 const deployedAddress = ref('')
 const isCorrectChain = ref<boolean>(true)
 const isDeploying = ref<boolean>(false)
+const isDeployed = ref<boolean>(false)
 
 const currentChain = useChainId()
 const compatibleChainName = config.chains.find((chain) => chain.id == compatibleChain)?.name
@@ -91,14 +95,18 @@ const deployBeaconProxy = async () => {
 
 <template>
   <div class="mt-40" v-if="isCorrectChain">
-    <CreateBallotCard
-      :showCreateBallotModal="showCreateBallotModal"
-      @toggleCreateBallotModal="() => (showCreateBallotModal = !showCreateBallotModal)"
-    />
-    <LoadingButton :color="'primary min-w-32 btn-sm'" v-if="isDeploying" />
-    <button class="btn btn-sm btn-primary" @click="deployBeaconProxy" v-else>
-      Deploy Contract
-    </button>
+    <div v-if="isDeployed">
+      <CreateBallotCard
+        :showCreateBallotModal="showCreateBallotModal"
+        @toggleCreateBallotModal="() => (showCreateBallotModal = !showCreateBallotModal)"
+      />
+    </div>
+    <div class="flex justify-center items-center" v-else>
+      <LoadingButton :color="'primary min-w-32 btn-sm'" v-if="isDeploying" />
+      <button class="btn btn-sm btn-primary" @click="deployBeaconProxy" v-else>
+        Deploy Contract
+      </button>
+    </div>
   </div>
   <div class="flex mt-40 justify-center items-center" v-else>
     <p class="text-center text-lg">Please switch to the {{ compatibleChainName }} network</p>

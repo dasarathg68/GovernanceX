@@ -7,7 +7,7 @@
     <div class="modal-box">
       <button
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-        @click="emits('toggleCreateBallotModal')"
+        @click="emits('toggleCreateProposalModal')"
       >
         ✕
       </button>
@@ -41,18 +41,25 @@
                 <input
                   type="text"
                   class="grow"
-                  v-model="searchUserName"
+                  v-model="candidate.name"
                   placeholder="Candidate Name"
                 />
                 |
-                <input type="text" class="w-60" v-model="searchUserAddress" placeholder="Address" />
+                <input
+                  type="text"
+                  class="w-60"
+                  v-model="candidate.candidateAddress"
+                  placeholder="Address"
+                />
               </label>
             </div>
           </div>
           <div class="flex justify-end mt-4">
             <IconPlus
               class="w-6 cursor-pointer"
-              @click="() => newProposalInput.candidates.push({ name: '', candidateAddress: '' })"
+              @click="
+                () => newProposalInput.candidates.push({ name: '', candidateAddress: '', votes: 0 })
+              "
             />
             <IconError
               class="w-4 cursor-pointer"
@@ -67,9 +74,11 @@
         </div>
 
         <div class="flex justify-center">
-          <!-- <LoadingButton v-if="isLoading" color="primary min-w-28" /> -->
+          <!-- <LoadingButton v-if="isPending" color="primary min-w-28" /> -->
 
-          <button class="btn btn-primary btn-md justify-center">Create Proposal</button>
+          <button class="btn btn-primary btn-md justify-center" @click="createProposal">
+            Create Proposal
+          </button>
         </div>
       </div>
     </div>
@@ -78,28 +87,81 @@
 
 <script setup lang="ts">
 import LoadingButton from '@/components/LoadingButton.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import IconError from '../icons/IconError.vue'
 import IconPlus from '../icons/IconPlus.vue'
+import { useAccount, useWriteContract } from '@wagmi/vue'
+// import { writeContract } from '@wagmi/core'
+
+import VOTING_ABI from '@/artifacts/abi/voting.json'
+import { config } from '@/wagmi.config'
+
+const { writeContract, error, isSuccess } = useWriteContract()
 
 const emits = defineEmits(['toggleCreateProposalModal'])
 const props = defineProps<{
   showCreateProposalModal: boolean
+  contractAddress: any
 }>()
 
-const searchUserName = ref('')
-const searchUserAddress = ref('')
+const { address } = useAccount()
 
 const newProposalInput = ref({
+  id: 0,
   title: '',
   description: '',
+  draftedBy: address.value,
+  isElection: false,
+  isActive: true,
+  teamId: 0,
+  votes: {
+    yes: 0,
+    no: 0,
+    abstain: 0
+  },
   candidates: [
     {
       name: '',
-      candidateAddress: ''
+      candidateAddress: '',
+      votes: 0
     }
   ],
-  isElection: false
+  voters: [
+    {
+      name: 'Dasarath G',
+      isEligible: true,
+      isVoted: false,
+      memberAddress: '0xaFeF48F7718c51fb7C6d1B314B3991D2e1d8421E'
+    },
+    {
+      name: 'Herm',
+      isEligible: true,
+      isVoted: false,
+      memberAddress: '0xc542BdA5EC1aC9b86fF470c04062D6a181e67928'
+    }
+  ]
+})
+const createProposal = async () => {
+  try {
+    console.log(JSON.stringify(newProposalInput.value))
+    const result = writeContract({
+      abi: VOTING_ABI,
+      address: props.contractAddress,
+      functionName: 'addProposal',
+      args: [newProposalInput.value]
+    })
+    console.log(result)
+  } catch (e) {
+    console.log(e)
+  }
+}
+watch(error, () => {
+  console.log(error.value)
+})
+watch(isSuccess, () => {
+  if (isSuccess.value) {
+    emits('toggleCreateProposalModal')
+  }
 })
 </script>

@@ -10,7 +10,8 @@
   </div>
   <CreateBallotModal
     :showCreateProposalModal="showCreateProposalModal"
-    @toggleCreateBallotModal="emits('toggleCreateProposalModal')"
+    :contractAddress="contractAddress"
+    @toggleCreateProposalModal="emits('toggleCreateProposalModal')"
   />
 </template>
 <script setup lang="ts">
@@ -19,5 +20,6 @@ import CreateBallotModal from '@/components/modals/CreateBallotModal.vue'
 const emits = defineEmits(['toggleCreateProposalModal'])
 const props = defineProps<{
   showCreateProposalModal: boolean
+  contractAddress: string
 }>()
 </script>

@@ -97,6 +97,7 @@ const deployBeaconProxy = async () => {
   <div class="mt-40" v-if="isCorrectChain">
     <div v-if="isDeployed">
       <CreateBallotCard
+        :contractAddress="deployedAddress"
         :showCreateProposalModal="showCreateProposalModal"
         @toggleCreateProposalModal="() => (showCreateProposalModal = !showCreateProposalModal)"
       />

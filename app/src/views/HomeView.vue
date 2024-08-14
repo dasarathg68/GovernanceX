@@ -56,7 +56,7 @@ onMounted(async () => {
     return
   }
 })
-const showCreateBallotModal = ref<boolean>(false)
+const showCreateProposalModal = ref<boolean>(false)
 const deployBeaconProxy = async () => {
   try {
     isDeploying.value = true
@@ -97,8 +97,8 @@ const deployBeaconProxy = async () => {
   <div class="mt-40" v-if="isCorrectChain">
     <div v-if="isDeployed">
       <CreateBallotCard
-        :showCreateBallotModal="showCreateBallotModal"
-        @toggleCreateBallotModal="() => (showCreateBallotModal = !showCreateBallotModal)"
+        :showCreateProposalModal="showCreateProposalModal"
+        @toggleCreateProposalModal="() => (showCreateProposalModal = !showCreateProposalModal)"
       />
     </div>
     <div class="flex justify-center items-center" v-else>

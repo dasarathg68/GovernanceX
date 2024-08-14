@@ -2,7 +2,7 @@
   <dialog
     id="my_modal_10"
     class="modal modal-bottom sm:modal-middle"
-    :class="{ 'modal-open': showCreateBallotModal }"
+    :class="{ 'modal-open': showCreateProposalModal }"
   >
     <div class="modal-box">
       <button
@@ -11,95 +11,95 @@
       >
         ✕
       </button>
-      <h1 class="font-bold text-2xl">Create New Ballot</h1>
-      <hr class="" />
-
+      <h2>Create Proposal</h2>
       <div class="flex flex-col gap-4 mt-2">
-        <input v-model="name" type="text" placeholder="Ballot Name" class="input input-primary" />
+        <select class="select select-primary w-full" v-model="newProposalInput.isElection">
+          <option disabled selected>Type of Proposal</option>
+          <option :value="true">Election</option>
+          <option :value="false">Directive</option>
+        </select>
         <input
-          type="datetime-local"
-          v-model="startDateTime"
-          placeholder="Start Date and Time"
-          class="input input-primary"
-        />
-        <input
-          type="datetime-local"
-          v-model="endDateTime"
-          placeholder="End Date and Time"
-          class="input input-primary"
-        />
-        <input
-          v-model="candidate"
           type="text"
-          placeholder="Candidate"
-          class="input input-primary"
-          @keyup.enter="addCandidate"
+          placeholder="Title"
+          class="input input-primary w-full"
+          v-model="newProposalInput.title"
         />
-        <div v-for="(candidate, index) in candidates" :key="index">
-          {{ candidate }}
+
+        <textarea
+          class="textarea textarea-primary h-24"
+          placeholder="Description"
+          v-model="newProposalInput.description"
+        ></textarea>
+        <div v-if="newProposalInput.isElection">
+          <div
+            class="flex text-sm gap-4 justify-between"
+            v-for="(candidate, index) in newProposalInput.candidates"
+            :key="index"
+          >
+            <div class="input-group mt-4">
+              <label class="input input-primary flex items-center gap-2 input-md">
+                <input
+                  type="text"
+                  class="grow"
+                  v-model="searchUserName"
+                  placeholder="Candidate Name"
+                />
+                |
+                <input type="text" class="w-60" v-model="searchUserAddress" placeholder="Address" />
+              </label>
+            </div>
+          </div>
+          <div class="flex justify-end mt-4">
+            <IconPlus
+              class="w-6 cursor-pointer"
+              @click="() => newProposalInput.candidates.push({ name: '', candidateAddress: '' })"
+            />
+            <IconError
+              class="w-4 cursor-pointer"
+              @click="
+                () => {
+                  if (newProposalInput.candidates.length - 1 > 0)
+                    newProposalInput.candidates.splice(newProposalInput.candidates.length - 1, 1)
+                }
+              "
+            />
+          </div>
         </div>
-        <input
-          v-model="voter"
-          type="text"
-          placeholder="Voter Address"
-          class="input input-primary"
-          @keyup.enter="addVoter"
-        />
-        <div v-for="(voter, index) in voters" :key="index">
-          {{ voter }}
+
+        <div class="flex justify-center">
+          <!-- <LoadingButton v-if="isLoading" color="primary min-w-28" /> -->
+
+          <button class="btn btn-primary btn-md justify-center">Create Proposal</button>
         </div>
-        <button class="btn btn-primary justify-center" @click="handleSubmit">Create Ballot</button>
       </div>
     </div>
   </dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from 'vue'
+import LoadingButton from '@/components/LoadingButton.vue'
+import { ref } from 'vue'
 
-const emits = defineEmits(['toggleCreateBallotModal'])
+import IconError from '../icons/IconError.vue'
+import IconPlus from '../icons/IconPlus.vue'
+
+const emits = defineEmits(['toggleCreateProposalModal'])
 const props = defineProps<{
-  showCreateBallotModal: boolean
+  showCreateProposalModal: boolean
 }>()
 
-const name = ref<string>('')
-const startDateTime = ref<string>('')
-const endDateTime = ref<string>('')
-const candidates = ref<string[]>([])
-const candidate = ref<string>('')
-const voters = ref<string[]>([])
-const voter = ref<string>('')
+const searchUserName = ref('')
+const searchUserAddress = ref('')
 
-const addCandidate = () => {
-  if (candidate.value.trim() !== '') {
-    candidates.value.push(candidate.value.trim())
-    candidate.value = ''
-  }
-}
-
-const addVoter = () => {
-  if (voter.value.trim() !== '') {
-    voters.value.push(voter.value.trim())
-    voter.value = ''
-  }
-}
-
-const handleSubmit = async () => {
-  const startTimeUnix = Date.parse(startDateTime.value) / 1000 // Dividing by 1000 to convert milliseconds to seconds
-  const endTimeUnix = Date.parse(endDateTime.value) / 1000
-
-  const votingStore = useVotingStore()
-  try {
-    await votingStore.createBallot(
-      name.value,
-      startTimeUnix,
-      endTimeUnix,
-      candidates.value,
-      voters.value
-    )
-    emits('toggleCreateBallotModal')
-  } catch (error) {
-    console.error(error)
-  }
-}
+const newProposalInput = ref({
+  title: '',
+  description: '',
+  candidates: [
+    {
+      name: '',
+      candidateAddress: ''
+    }
+  ],
+  isElection: false
+})
 </script>

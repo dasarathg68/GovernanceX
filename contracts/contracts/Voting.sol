@@ -30,10 +30,10 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
     constructor() {
     }
     function addDirectiveProposal(
-        string calldata _title,
-        string calldata _description,
-        string calldata _draftedBy,
-        address[] calldata _voters
+        string memory _title,
+        string memory _description,
+        string memory _draftedBy,
+        address[] memory _voters
     ) public {
         require(bytes(_title).length > 0, "Title cannot be empty");
 
@@ -51,17 +51,16 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         }
 
         proposalsById[proposalCount] = newProposal;
-
         emit ProposalAdded(proposalCount, _title, _description);
         proposalCount++;
     }
 
     function addElectionProposal(
-        string calldata _title,
-        string calldata _description,
-        string calldata _draftedBy,
-        address[] calldata _candidates,
-        address[] calldata _voters
+        string memory _title,
+        string memory _description,
+        string memory _draftedBy,
+        address[] memory _candidates,
+        address[] memory _voters
     ) public {
         require(bytes(_title).length > 0, "Title cannot be empty");
 

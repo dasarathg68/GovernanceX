@@ -75,8 +75,9 @@
 
         <div class="flex justify-center">
           <!-- <LoadingButton v-if="isPending" color="primary min-w-28" /> -->
+          <LoadingButton v-if="isLoading" color="btn btn-primary min-w-24" />
 
-          <button class="btn btn-primary btn-md justify-center" @click="createProposal">
+          <button class="btn btn-primary btn-md justify-center" @click="createProposal" v-else>
             Create Proposal
           </button>
         </div>
@@ -86,19 +87,23 @@
 </template>
 
 <script setup lang="ts">
-import LoadingButton from '@/components/LoadingButton.vue'
 import { ref, watch } from 'vue'
 
 import IconError from '../icons/IconError.vue'
 import IconPlus from '../icons/IconPlus.vue'
 import { useAccount, useWriteContract } from '@wagmi/vue'
-// import { writeContract } from '@wagmi/core'
 
 import VOTING_ABI from '@/artifacts/abi/voting.json'
-import { config } from '@/wagmi.config'
+import { getAddress } from 'viem'
+import { useToastStore } from '@/stores/toast'
+import { ToastType } from '@/types'
+import LoadingButton from '@/components/LoadingButton.vue'
+
+const { show } = useToastStore()
 
 const { writeContract, error, isSuccess } = useWriteContract()
 
+const isLoading = ref(false)
 const emits = defineEmits(['toggleCreateProposalModal'])
 const props = defineProps<{
   showCreateProposalModal: boolean
@@ -128,39 +133,53 @@ const newProposalInput = ref({
     }
   ],
   voters: [
-    {
-      name: 'Dasarath G',
-      isEligible: true,
-      isVoted: false,
-      memberAddress: '0xaFeF48F7718c51fb7C6d1B314B3991D2e1d8421E'
-    },
-    {
-      name: 'Herm',
-      isEligible: true,
-      isVoted: false,
-      memberAddress: '0xc542BdA5EC1aC9b86fF470c04062D6a181e67928'
-    }
+    getAddress('0xaFeF48F7718c51fb7C6d1B314B3991D2e1d8421E'),
+    getAddress('0xc542BdA5EC1aC9b86fF470c04062D6a181e67928')
   ]
 })
 const createProposal = async () => {
   try {
-    console.log(JSON.stringify(newProposalInput.value))
-    const result = writeContract({
-      abi: VOTING_ABI,
-      address: props.contractAddress,
-      functionName: 'addProposal',
-      args: [newProposalInput.value]
-    })
-    console.log(result)
+    isLoading.value = true
+
+    let votersList = []
+    for (let i = 0; i < newProposalInput.value.voters.length; i++) {
+      votersList.push(newProposalInput.value.voters[i])
+    }
+    console.log([
+      newProposalInput.value.title,
+      newProposalInput.value.description,
+      newProposalInput.value.draftedBy,
+      votersList
+    ])
+    // console.log(votersList)
+    if (!newProposalInput.value.isElection) {
+      writeContract({
+        abi: VOTING_ABI,
+        address: props.contractAddress,
+        functionName: 'addDirectiveProposal',
+        args: [
+          newProposalInput.value.title,
+          newProposalInput.value.description,
+          newProposalInput.value.draftedBy,
+          votersList
+        ]
+      })
+    }
   } catch (e) {
     console.log(e)
   }
 }
 watch(error, () => {
-  console.log(error.value)
+  if (error.value) {
+    isLoading.value = false
+    show(ToastType.Error, 'Error creating proposal')
+  }
 })
+
 watch(isSuccess, () => {
   if (isSuccess.value) {
+    isLoading.value = false
+    show(ToastType.Success, 'Proposal created successfully')
     emits('toggleCreateProposalModal')
   }
 })

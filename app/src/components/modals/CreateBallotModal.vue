@@ -145,13 +145,7 @@ const createProposal = async () => {
     for (let i = 0; i < newProposalInput.value.voters.length; i++) {
       votersList.push(newProposalInput.value.voters[i])
     }
-    console.log([
-      newProposalInput.value.title,
-      newProposalInput.value.description,
-      newProposalInput.value.draftedBy,
-      votersList
-    ])
-    // console.log(votersList)
+
     if (!newProposalInput.value.isElection) {
       writeContract({
         abi: VOTING_ABI,

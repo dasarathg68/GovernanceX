@@ -26,13 +26,17 @@ async function storeDeployedAddress() {
   }
 }
 async function getDeployedAddress() {
-  const { data } = await supabase
-    .from('Contract')
-    .select('deployedAddress')
-    .eq('userAddress', currentAddress.value)
-  if ((data as any).length > 0) {
-    deployedAddress.value = (data as any)[0].deployedAddress
-    isDeployed.value = true
+  try {
+    const { data } = await supabase
+      .from('Contract')
+      .select('deployedAddress')
+      .eq('userAddress', currentAddress.value)
+    if ((data as any).length > 0) {
+      deployedAddress.value = (data as any)[0].deployedAddress
+      isDeployed.value = true
+    }
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -46,10 +50,10 @@ const isDeployed = ref<boolean>(false)
 
 const currentChain = useChainId()
 const compatibleChainName = config.chains.find((chain) => chain.id == compatibleChain)?.name
-console.log(compatibleChainName)
 
 onMounted(async () => {
   await getDeployedAddress()
+  console.log(currentChain.value, compatibleChain)
   if (currentChain.value != compatibleChain) {
     show(ToastType.Error, `Please switch to the ${compatibleChainName} network`)
     isCorrectChain.value = false

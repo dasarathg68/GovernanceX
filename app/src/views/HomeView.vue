@@ -8,12 +8,13 @@ import { deployContract, getTransactionCount } from '@wagmi/core'
 import { config } from '@/wagmi.config'
 import { chainId as compatibleChain, VOTING_BEACON_ADDRESS } from '@/artifacts/constants'
 import BEACON_PROXY_ABI from '@/artifacts/abi/beacon-proxy.json'
-import { useChainId, useAccount } from '@wagmi/vue'
+import { useChainId, useAccount, useSwitchChain } from '@wagmi/vue'
 import { useToastStore } from '@/stores/toast'
 import { onMounted, ref } from 'vue'
 import { ToastType } from '@/types'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { supabase } from '@/utils/supabase'
+
 async function storeDeployedAddress() {
   try {
     await supabase
@@ -50,6 +51,8 @@ const isDeployed = ref<boolean>(false)
 
 const currentChain = useChainId()
 const compatibleChainName = config.chains.find((chain) => chain.id == compatibleChain)?.name
+
+const { chains, switchChain } = useSwitchChain()
 
 onMounted(async () => {
   await getDeployedAddress()
@@ -113,7 +116,15 @@ const deployBeaconProxy = async () => {
       </button>
     </div>
   </div>
-  <div class="flex mt-40 justify-center items-center" v-else>
+  <div class="flex flex-col mt-40 justify-center items-center" v-else>
     <p class="text-center text-lg">Please switch to the {{ compatibleChainName }} network</p>
+    <button
+      v-for="chain in chains"
+      :key="chain.id"
+      @click="switchChain({ chainId: chain.id })"
+      class="btn btn-secondary"
+    >
+      {{ chain.name }}
+    </button>
   </div>
 </template>

@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { Voting } from "../typechain-types";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
-import { Types } from "../typechain-types/contracts/Voting";
 
 describe("Voting Contract", () => {
   let voting: Voting;
@@ -15,17 +14,9 @@ describe("Voting Contract", () => {
   let member6: SignerWithAddress;
   let notMember: SignerWithAddress;
 
-  const candidates: Types.CandidateStruct[] = [
-    {
-      name: "Candidate 1",
-      candidateAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      votes: 0,
-    },
-    {
-      name: "Candidate 2",
-      candidateAddress: "0x92d402Df9C107a5d539Fd8A430AaC9e2d93C0221",
-      votes: 0,
-    },
+  const candidates = [
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0x92d402Df9C107a5d539Fd8A430AaC9e2d93C0221",
   ];
 
   async function deployContracts() {
@@ -43,51 +34,20 @@ describe("Voting Contract", () => {
 
   describe("CRUD Members and Proposals", async () => {
     it("should add a directive proposal successfully", async () => {
-      const voters: Types.MemberStruct[] = [
-        {
-          name: "Member 1",
-          memberAddress: await member1.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 2",
-          memberAddress: await member2.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 3",
-          memberAddress: await member3.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 4",
-          memberAddress: await member4.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 5",
-          memberAddress: await member5.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 6",
-          memberAddress: await member6.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
+      const voters = [
+        member1.address,
+        member2.address,
+        member3.address,
+        member4.address,
+        member5.address,
+        member6.address,
       ];
 
       await expect(
         voting.addDirectiveProposal(
           "Proposal 1",
           "Description of Proposal 1",
-          await owner.getAddress(),
-          1,
+          owner.address,
           voters
         )
       )
@@ -100,27 +60,13 @@ describe("Voting Contract", () => {
     });
 
     it("should add an election proposal successfully", async () => {
-      const voters: Types.MemberStruct[] = [
-        {
-          name: "Member 1",
-          memberAddress: await member1.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-        {
-          name: "Member 2",
-          memberAddress: await member2.getAddress(),
-          isVoted: false,
-          isEligible: true,
-        },
-      ];
+      const voters = [member1.address, member2.address];
 
       await expect(
         voting.addElectionProposal(
           "Proposal 2",
           "Description of Proposal 2",
-          await owner.getAddress(),
-          1,
+          owner.address,
           candidates,
           voters
         )
@@ -146,7 +92,7 @@ describe("Voting Contract", () => {
 
       await expect(votingAsMember1.voteDirective(0, 1))
         .to.emit(voting, "DirectiveVoted")
-        .withArgs(await member1.getAddress(), 0, 1);
+        .withArgs(member1.address, 0, 1);
 
       const proposal = await voting.getProposalById(0);
       expect(proposal.votes.yes).to.equal(1);
@@ -162,19 +108,13 @@ describe("Voting Contract", () => {
     it("should vote on an election proposal successfully", async () => {
       const votingAsMember2 = voting.connect(member2);
 
-      await expect(
-        votingAsMember2.voteElection(1, candidates[1].candidateAddress)
-      )
+      await expect(votingAsMember2.voteElection(1, candidates[1]))
         .to.emit(voting, "ElectionVoted")
-        .withArgs(
-          await member2.getAddress(),
-          1,
-          candidates[1].candidateAddress
-        );
+        .withArgs(member2.address, 1, candidates[1]);
 
       const proposal = await voting.getProposalById(1);
       const candidate = proposal.candidates.find(
-        (c) => c.candidateAddress === candidates[1].candidateAddress
+        (c) => c.candidateAddress === candidates[1]
       );
       expect(candidate?.votes).to.equal(1);
     });
@@ -182,7 +122,7 @@ describe("Voting Contract", () => {
     it("should not allow a member to vote twice on an election proposal", async () => {
       const votingAsMember2 = voting.connect(member2);
       await expect(
-        votingAsMember2.voteElection(1, candidates[1].candidateAddress)
+        votingAsMember2.voteElection(1, candidates[1])
       ).to.be.revertedWith("You have already voted");
     });
 

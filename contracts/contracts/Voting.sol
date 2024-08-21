@@ -33,8 +33,7 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         string calldata _title,
         string calldata _description,
         string calldata _draftedBy,
-        uint256 _teamId,
-        Types.Member[] calldata _voters
+        address[] calldata _voters
     ) public {
         require(bytes(_title).length > 0, "Title cannot be empty");
 
@@ -45,10 +44,10 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         newProposal.draftedBy = _draftedBy;
         newProposal.isElection = false;
         newProposal.isActive = true;
-        newProposal.teamId = _teamId;
 
         for (uint256 i = 0; i < _voters.length; i++) {
-            newProposal.voters.push(_voters[i]);
+            Types.Member memory voter = Types.Member({isEligible:true, isVoted: false, memberAddress:_voters[i]});
+            newProposal.voters.push(voter);
         }
 
         proposalsById[proposalCount] = newProposal;
@@ -61,9 +60,8 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         string calldata _title,
         string calldata _description,
         string calldata _draftedBy,
-        uint256 _teamId,
-        Types.Candidate[] calldata _candidates,
-        Types.Member[] calldata _voters
+        address[] calldata _candidates,
+        address[] calldata _voters
     ) public {
         require(bytes(_title).length > 0, "Title cannot be empty");
 
@@ -75,14 +73,15 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         newProposal.draftedBy = _draftedBy;
         newProposal.isElection = true;
         newProposal.isActive = true;
-        newProposal.teamId = _teamId;
 
         for (uint256 i = 0; i < _candidates.length; i++) {
-            newProposal.candidates.push(_candidates[i]);
+            Types.Candidate memory candidate = Types.Candidate({candidateAddress:_candidates[i], votes:0});
+            newProposal.candidates.push(candidate);
         }
 
         for (uint256 i = 0; i < _voters.length; i++) {
-            newProposal.voters.push(_voters[i]);
+            Types.Member memory voter = Types.Member({isEligible:true, isVoted: false, memberAddress:_voters[i]});
+            newProposal.voters.push(voter);
         }
 
         proposalsById[proposalCount] = newProposal;

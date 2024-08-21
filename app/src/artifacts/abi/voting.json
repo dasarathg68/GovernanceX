@@ -221,36 +221,9 @@
         "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "_teamId",
-        "type": "uint256"
-      },
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "bool",
-            "name": "isEligible",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "isVoted",
-            "type": "bool"
-          },
-          {
-            "internalType": "address",
-            "name": "memberAddress",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct Types.Member[]",
+        "internalType": "address[]",
         "name": "_voters",
-        "type": "tuple[]"
+        "type": "address[]"
       }
     ],
     "name": "addDirectiveProposal",
@@ -276,58 +249,14 @@
         "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "_teamId",
-        "type": "uint256"
-      },
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "candidateAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "votes",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Types.Candidate[]",
+        "internalType": "address[]",
         "name": "_candidates",
-        "type": "tuple[]"
+        "type": "address[]"
       },
       {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "bool",
-            "name": "isEligible",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "isVoted",
-            "type": "bool"
-          },
-          {
-            "internalType": "address",
-            "name": "memberAddress",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct Types.Member[]",
+        "internalType": "address[]",
         "name": "_voters",
-        "type": "tuple[]"
+        "type": "address[]"
       }
     ],
     "name": "addElectionProposal",
@@ -346,6 +275,19 @@
     "name": "concludeProposal",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getHelloWorld",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -391,11 +333,6 @@
             "type": "bool"
           },
           {
-            "internalType": "uint256",
-            "name": "teamId",
-            "type": "uint256"
-          },
-          {
             "components": [
               {
                 "internalType": "uint256",
@@ -420,11 +357,6 @@
           {
             "components": [
               {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-              },
-              {
                 "internalType": "address",
                 "name": "candidateAddress",
                 "type": "address"
@@ -441,11 +373,6 @@
           },
           {
             "components": [
-              {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-              },
               {
                 "internalType": "bool",
                 "name": "isEligible",
@@ -560,11 +487,6 @@
         "internalType": "bool",
         "name": "isActive",
         "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "teamId",
-        "type": "uint256"
       },
       {
         "components": [

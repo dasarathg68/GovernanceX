@@ -10,10 +10,11 @@ import { chainId as compatibleChain, VOTING_BEACON_ADDRESS } from '@/artifacts/c
 import BEACON_PROXY_ABI from '@/artifacts/abi/beacon-proxy.json'
 import { useChainId, useAccount, useSwitchChain } from '@wagmi/vue'
 import { useToastStore } from '@/stores/toast'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { ToastType } from '@/types'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { supabase } from '@/utils/supabase'
+import { readContract } from '@wagmi/core'
 
 async function storeDeployedAddress() {
   try {
@@ -35,6 +36,24 @@ async function getDeployedAddress() {
     if ((data as any).length > 0) {
       deployedAddress.value = (data as any)[0].deployedAddress
       isDeployed.value = true
+      const proposalCount = await readContract(config, {
+        abi: VOTING_ABI,
+        functionName: 'proposalCount',
+        address: deployedAddress.value
+      })
+      if (proposalCount && proposalCount) {
+        for (let i = 0; i < Number(proposalCount); i++) {
+          const proposal: any = await readContract(config, {
+            abi: VOTING_ABI,
+            functionName: 'getProposalById',
+            args: [i],
+            address: deployedAddress.value
+          })
+          console.log(proposal)
+          proposals.value.push(proposal)
+        }
+      }
+      console.log('proposals', proposals.value)
     }
   } catch (error) {
     console.error(error)
@@ -44,7 +63,17 @@ async function getDeployedAddress() {
 const { show } = useToastStore()
 const { address: currentAddress } = useAccount()
 
-const deployedAddress = ref('')
+const proposals = ref<
+  {
+    title: string
+    description: string
+    draftedBy: string
+    isElection: boolean
+    isActive: boolean
+    voteCount: any
+  }[]
+>([])
+const deployedAddress = ref<string>('')
 const isCorrectChain = ref<boolean>(true)
 const isDeploying = ref<boolean>(false)
 const isDeployed = ref<boolean>(false)

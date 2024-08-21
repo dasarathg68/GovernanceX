@@ -29,41 +29,74 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
 
     constructor() {
     }
-    function addProposal(Types.Proposal calldata _proposal) public {
-        require(bytes(_proposal.title).length > 0, "Title cannot be empty");
+    function addDirectiveProposal(
+        string calldata _title,
+        string calldata _description,
+        string calldata _draftedBy,
+        uint256 _teamId,
+        Types.Member[] calldata _voters
+    ) public {
+        require(bytes(_title).length > 0, "Title cannot be empty");
 
         Types.Proposal storage newProposal = proposalsById[proposalCount];
-        
         newProposal.id = proposalCount;
-        newProposal.title = _proposal.title;
-        newProposal.description = _proposal.description;
-        newProposal.draftedBy = _proposal.draftedBy;
-        newProposal.isElection = _proposal.isElection;
-        newProposal.isActive = _proposal.isActive;
-        newProposal.teamId = _proposal.teamId;
+        newProposal.title = _title;
+        newProposal.description = _description;
+        newProposal.draftedBy = _draftedBy;
+        newProposal.isElection = false;
+        newProposal.isActive = true;
+        newProposal.teamId = _teamId;
 
-        for (uint256 i = 0; i < _proposal.candidates.length; i++) {
-            newProposal.candidates.push(_proposal.candidates[i]);
+        for (uint256 i = 0; i < _voters.length; i++) {
+            newProposal.voters.push(_voters[i]);
         }
-
-        for (uint256 i = 0; i < _proposal.voters.length; i++) {
-            newProposal.voters.push(_proposal.voters[i]);
-        }
-
-        newProposal.votes = _proposal.votes;
 
         proposalsById[proposalCount] = newProposal;
 
-        emit ProposalAdded(proposalCount, _proposal.title, _proposal.description);
+        emit ProposalAdded(proposalCount, _title, _description);
         proposalCount++;
     }
 
+    function addElectionProposal(
+        string calldata _title,
+        string calldata _description,
+        string calldata _draftedBy,
+        uint256 _teamId,
+        Types.Candidate[] calldata _candidates,
+        Types.Member[] calldata _voters
+    ) public {
+        require(bytes(_title).length > 0, "Title cannot be empty");
+
+        Types.Proposal storage newProposal = proposalsById[proposalCount];
+
+        newProposal.id = proposalCount;
+        newProposal.title = _title;
+        newProposal.description = _description;
+        newProposal.draftedBy = _draftedBy;
+        newProposal.isElection = true;
+        newProposal.isActive = true;
+        newProposal.teamId = _teamId;
+
+        for (uint256 i = 0; i < _candidates.length; i++) {
+            newProposal.candidates.push(_candidates[i]);
+        }
+
+        for (uint256 i = 0; i < _voters.length; i++) {
+            newProposal.voters.push(_voters[i]);
+        }
+
+        proposalsById[proposalCount] = newProposal;
+
+        emit ProposalAdded(proposalCount, _title, _description);
+        proposalCount++;
+    }
 
     function voteDirective(uint256 proposalId, uint256 vote) public {
         require(proposalId < proposalCount, "Proposal does not exist");
 
         Types.Proposal storage proposal = proposalsById[proposalId];
         require(proposal.isActive, "Proposal is not active");
+        require(!proposal.isElection, "Not a directive proposal");
 
         Types.Member storage voter = findVoter(proposal, msg.sender);
 
@@ -76,15 +109,14 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         emit DirectiveVoted(msg.sender, proposalId, vote);
     }
 
-    function voteElection( uint256 proposalId, address candidateAddress) public {
+    function voteElection(uint256 proposalId, address candidateAddress) public {
         require(proposalId < proposalCount, "Proposal does not exist");
 
         Types.Proposal storage proposal = proposalsById[proposalId];
         require(proposal.isActive, "Proposal is not active");
+        require(proposal.isElection, "Not an election proposal");
 
         Types.Member storage voter = findVoter(proposal, msg.sender);
-        console.log("hi");
-
 
         require(voter.isEligible, "You are not eligible to vote");
         require(!voter.isVoted, "You have already voted");
@@ -120,11 +152,11 @@ contract Voting is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgra
         }
         revert("You are not registered to vote in this proposal");
     }
-    function getProposalById(uint256 proposalId) public view returns (Types.Proposal memory) {
-    require(proposalId < proposalCount, "Proposal does not exist");
-    return proposalsById[proposalId];
-}
 
+    function getProposalById(uint256 proposalId) public view returns (Types.Proposal memory) {
+        require(proposalId < proposalCount, "Proposal does not exist");
+        return proposalsById[proposalId];
+    }
 
     function recordDirectiveVote(Types.Proposal storage proposal, uint256 vote) internal {
         if (vote == 0) {

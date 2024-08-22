@@ -158,6 +158,23 @@ const createProposal = async () => {
           votersList
         ]
       })
+    } else {
+      let candidatesList: Array<string> = []
+      for (let i = 0; i < newProposalInput.value.candidates.length; i++) {
+        candidatesList.push(newProposalInput.value.candidates[i].candidateAddress)
+      }
+      writeContract({
+        abi: VOTING_ABI,
+        address: props.contractAddress,
+        functionName: 'addElectionProposal',
+        args: [
+          newProposalInput.value.title,
+          newProposalInput.value.description,
+          newProposalInput.value.draftedBy,
+          votersList,
+          candidatesList
+        ]
+      })
     }
   } catch (e) {
     console.log(e)
@@ -166,6 +183,7 @@ const createProposal = async () => {
 watch(error, () => {
   if (error.value) {
     isLoading.value = false
+    console.log(error.value)
     show(ToastType.Error, 'Error creating proposal')
   }
 })
